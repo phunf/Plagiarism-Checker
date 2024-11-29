@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🕵️ Ứng Dụng Kiểm Tra Đạo Văn</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .upload-container:hover {
+            background-color: #f0f0f0;
+        }
+        #submit-btn {
+            display: none;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #file-list {
+            margin-top: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="drop-area" class="upload-container">
+        <input type="file" id="file-upload" accept=".txt,.docx,.pdf" style="display:none;">
+        <label for="file-upload">
+            <strong>🔍 Chọn hoặc kéo thả file (txt, docx, pdf)</strong>
+        </label>
+        <div id="file-name"></div>
+        <button id="submit-btn">Kiểm Tra Đạo Văn</button>
+    </div>
+
+    <div id="results"></div>
+
+    <div id="file-list-container">
+        <h2>Danh Sách File Đã Kiểm Tra</h2>
+        <div id="file-list"></div>
+    </div>
+
+    <script>
+        const dropArea = document.getElementById('drop-area');
+        const fileUpload = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultsDiv = document.getElementById('results');
+        const fileListDiv = document.getElementById('file-list');
+        let currentFileId = null;
+
+        // File selection and drag-drop event handlers
+        fileUpload.addEventListener('change', handleFileSelect);
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.style.backgroundColor = '#f0f0f0';
+        }
+
+        function unhighlight() {
+            dropArea.style.backgroundColor = 'white';
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                const allowedTypes = [
+                    'text/plain', 
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                    'application/pdf'
+                ];
+                const allowedExtensions = ['.txt', '.docx', '.pdf'];
+
+                if (allowedTypes.includes(file.type) || 
+                    allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))) {
+                    fileNameDisplay.textContent = `Đã chọn file: ${file.name}`;
+                    submitBtn.style.display = 'block';
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'Vui lòng chọn file văn bản (.txt, .docx, .pdf)'
+                    });
+                    fileUpload.value = ''; // Clear selected file
+                }
+            }
+        }
+
+        submitBtn.addEventListener('click', checkPlagiarism);
+
+        function checkPlagiarism() {
+            const file = fileUpload.files[0];
+            if (!file) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Vui lòng chọn file để kiểm tra'
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show loading
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ trong giây lát',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('/check_plagiarism', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close loading
+                Swal.close();
+
+                // Debug: Log response data
+                console.log('Server Response:', data);
+
+                // Check for errors
+                if (data.error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: data.error
+                    });
+                    return;
+                }
+
+                // Save file ID for later use
+                currentFileId = data.file_id;
+
+                // Process results
+                let resultHTML = `
+                    <h2>🔍 Kết Quả Kiểm Tra Đạo Văn</h2>
+                    <p><strong>File:</strong> ${data.filename}</p>
+                `;
+
+                let hasPlagiarism = false;
+
+                // Internal plagiarism check
+                if (data.internal_plagiarism && data.internal_plagiarism.length > 0) {
+                    hasPlagiarism = true;
+                    resultHTML += '<h3>🚨 Đạo Văn Nội Bộ:</h3>';
+                    // ... rest of internal plagiarism code ...
+                }
+
+                // Online plagiarism check
+                if (data.online_plagiarism && data.online_plagiarism.length > 0) {
+                    hasPlagiarism = true;
+                    resultHTML += '<h3>🌐 Đạo Văn Từ Nguồn Trực Tuyến:</h3>';
+                    // ... rest of online plagiarism code ...
+                }
+
+                // Against uploaded files check
+                if (data.against_results && data.against_results.length > 0) {
+                    hasPlagiarism = true;
+                    resultHTML += '<h3>🔄 Đạo Văn So Với File Đã Upload:</h3>';
+                    data.against_results.forEach(item => {
+                        resultHTML += `
+                            <div style="background-color: #fff3e6; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                                <p><strong>File so sánh:</strong> ${item.compared_file}</p>
+                                <p><strong>Độ tương đồng:</strong> ${item.similarity}%</p>
+                                <p><strong>Đoạn văn:</strong> ${item.paragraph.substring(0, 100)}...</p>
+                            </div>
+                        `;
+                    });
+                }
+
+                // No plagiarism found
+                if (!hasPlagiarism) {
+                    resultHTML += `
+                        <div style="background-color: #e6f3e6; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                            <p>✅ Không phát hiện đạo. Văn bản của bạn là gốc!</p>
+                        </div>
+                    `;
+                }
+
+                // Update results div
+                resultsDiv.innerHTML = resultHTML;
+                
+                // Update file list
+                updateFileList(data.filename);
+            })
+            .catch(error => {
+                Swal.close();
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Có lỗi xảy ra khi kiểm tra đạo văn'
+                });
+            });
+        }
+
+        function updateFileList(filename) {
+            const fileListItem = document.createElement('div');
+            fileListItem.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 5px;">
+                    <span>${filename}</span>
+                    <button onclick="viewPreviousResult('${currentFileId}')" style="background-color: #2196F3; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                        Xem Lại
+                    </button>
+                </div>
+            `;
+            fileListDiv.insertBefore(fileListItem, fileListDiv.firstChild);
+        }
+
+        function viewPreviousResult(fileId) {
+            // Implement fetching previous result by file ID
+            fetch(`/get_previous_result/${fileId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Similar to processing initial result, but using the stored data
+                let resultHTML = `
+                    <h2>🔍 Kết Quả Kiểm Tra Đạo Văn Trước Đó</h2>
+                    <p><strong>File:</strong> ${data.filename}</p>
+                `;
+                
+                // Process and display results similar to initial result display
+                // (You would copy the result processing logic from above)
+                resultsDiv.innerHTML = resultHTML;
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Không thể tải kết quả trước đó'
+                });
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
