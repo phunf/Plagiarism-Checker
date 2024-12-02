@@ -1,0 +1,173 @@
+TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT TP.HCM
+KHOA ĐÀO TẠO CHẤT LƯỢNG CAO
+NGÀNH CÔNG NGHỆ THÔNG TIN
+BÁO CÁO ĐỒ ÁN
+CẤU TRÚC DỮ LIỆU VÀ GIẢI THUẬT
+THIẾT KẾ CHƯƠNG TRÌNH
+QUẢN LÝ CÂY GIA PHẢ
+(CÂY NHỊ PHÂN TÌM KIẾM)
+SVTH: NGUYỄN LÊ NGUYÊN ANH 
+MSSV: 17110094
+SVTH: VÕ THÀNH VĂN
+MSSV: 17110252
+SVTH: TRẦN GIA HÂN
+MSSV: 17110133
+GVHD: Ths. TRẦN CÔNG TÚ
+	TP. Hồ Chí Minh, tháng 12 năm 2018
+DANH MỤC HÌNH
+Hình 1. Mô tả cây gia phả	5
+Hình 2. Cấu trúc của 1 Node	6
+Hình 3. Cấu trúc của Gia Phả	6
+Hình 4. Thêm cây	7
+Hình 5. Tìm kiếm một nút	7
+Hình 6. Xóa một nút	8
+Hình 7. Xóa toàn bộ cây	8
+Hình 8. Tìm kiếm ba mẹ của một người	9
+Hình 9. Thêm thành viên	10
+Hình 10. Xóa thành viên	11
+Hình 11. Sửa thông tin	12
+Hình 12. Form Khởi động	13
+Hình 13. Form xem Gia Phả dạng danh sách	13
+Hình 14. Form xem Gia Phả dạng cây Thư Mục	14
+Hình 15. Menu xem người cùng thế hệ	14
+Hình 16. Menu xem con cháu, ông bà	14
+Hình 17. Menu xem người thuộc Gia Phả	15
+Hình 18. Form hướng dẫn	15
+	
+LỜI CẢM ƠN
+Lời đầu tiên, nhóm thực hiện xin được phép gửi lời cảm ơn chân thành đến khoa Đào tạo Chất Lượng Cao – Trường Đại học Sư phạm Kỹ thuật Thành phố Hồ Chí Minh đã tạo mọi điều kiện thuận lợi nhất cho nhóm thực hiện có cơ hội được tự do tiếp cận tham khảo, mở rộng thêm kiến thức trong lĩnh vực công nghệ thông tin nói chung và môn Cấu trúc Dữ liệu - Giải thuật nói riêng. 
+Lời cảm ơn trân trọng nhất nhóm thực hiện xin chân thành gửi đến Thầy Trần Công Tú – người đã dùng mọi tâm huyết, và tri thức của người Thầy, cùng đồng hành và trực tiếp giảng dạy, hướng dẫn và tạo mọi điều kiện thuận lợi giúp đỡ cho nhóm phát huy hết khả năng cũng như nâng cao kiến thức trong suốt quá trình học tập, đặc biệt là trong quá trình chuẩn bị và thực hiện đề tài môn học. Cảm ơn sự nhiệt tình của Thầy, là động lực vô cùng to lớn giúp nhóm thực hiện thực hiện, kiên trì trong suốt quá trình thực hiện đề tài và khám phá ra những kiến thức mới đầy thú vị và bổ ích liên quan đến đề tài mà cụ thể là đề tài Xây dựng chương trình quản lý cây Gia Phả.
+Nhóm thực hiện xin trân trọng cảm ơn.
+PHẦN MỞ ĐẦU
+1. Lí do, mục đích chọn đề tài
+Ắt hẳn trong chúng ta đều đã từng biết đến những cuốn tài liệu ngả màu ghi chép thông tin của những người thân trong gia đình và những người có liên quan với nhau trong dòng họ, gia tộc, tài liệu đó chính là gia phả. Hay gia phả là bản ghi chép tên họ, tuổi tác, vai trò và công đức của cha mẹ, ông bà, tổ tiên trong thời đại mà họ đã sinh ra và lớn lên của một gia đình hay dòng họ. 
+Gia phả đã xuất hiện từ thời xa xưa ở phương Tây cũng như ở phương Đông. Một gia phả dù đơn sơ hay súc tích cũng đều trở thành những tài liệu quý báu. Để thấy rõ một cách tổng quát các chi lớn, nhỏ, xa, gần của một họ, người ta còn lập ra các phả đồ, với những hình vẽ đơn giản kèm theo tên tuổi ghi vắn tắt ở bên dưới.
+Theo khảo sát thực tế, nhóm thực hiện thấy đại đa số dòng tộc đều quản lý dòng họ của mình chỉ qua  thông qua từ một đến hai cuốn Gia Phả, từ đó chúng ta có thể tưởng tượng hoặc hình dung ra một dòng họ có rất nhiều người. Hơn nữa, nếu có người mới được sinh ra hay dòng họ này  tìm được một ai đó bị thất lạc do chiến tranh hay thông tin cá nhân của người nào đó bị sai lệch thì chính vì sự quản lý rất là rườm rà sẽ khiến những thông tin ghi trong cuốn Gia Phả sẽ không được thống kê đầy đủ hoặc bị sai sót. Với mỗi trường hợp như vậy thì người giữ cuốn Gia Phả muốn sửa lại thông tin thì cũng phải thống kê lại toàn bộ những thông tin đã có trong Gia Phả. Có những lúc phải bỏ cả cuốn Gia Phả cũ đi để thống kê vào cuốn Gia Phả mới. Điều này làm tiêu tốn  một lượng lớn thời gian, gây thêm rắc rối cho người nào muốn sao lưu lại cuốn Gia Phả hay muốn tìm kiếm thông tin của một ai đó trong họ.
+Vì những bất cập đó, nhóm thực hiện đã thấy được tầm quan trọng và lợi ích của việc lưu trữ các phả hệ trong gia tộc. Vì thế, nhóm thực hiện đã chọn đề tài Xây dựng chương trình Quản lý cây Gia Phả. Hy vọng với phần giao diện đơn giản, dễ sử dụng mà nhóm thực hiện đã mô phỏng trong chương trình sẽ giúp việc lưu trữ này trở nên dễ dàng và thuận tiện hơn. Không chỉ giúp tiết kiệm về mặt thời gian, phần mềm còn hỗ trợ quản lý một tấm Gia phả thiêng liêng của cả dòng họ, cộng với sự phát triển của Công nghệ Thông tin ngày càng hiện đại và tân tiến sẽ giúp cho việc xây dựng và quản lý cây Gia Phả tốt hơn nữa trong tương lai.
+2. Mục tiêu thực hiện đề tài
+Nhóm thực hiện đã đặt ra một số yêu cầu về chức năng như sau
+1.3.1. Chức năng hệ thống của phần mềm
+a. Cập nhật thông tin cá nhân
+-	Cập nhật thông tin cá nhân.
+b. Tra cứu những thông tin liên quan đến Gia Phả
+- Tra cứu thông tin cá nhân thuộc Gia Phả.
+c. Xuất cây Gia Phả và hỗ trợ những thao tác trên cây
+-	Xóa.
+- 	Sửa.
+- 	Tra cứu.
+- 	Thêm.
+1.3.2. Yêu cầu hệ thống phần mềm
+a. Yêu cầu chức năng
+Lưu trữ:
+-	Lưu trữ các thông tin về cá nhân: ID cá nhân, ID Gia Phả, đời, họ và tên, ngày sinh, ngày mất, nơi sinh, nghề nghiệp, ghi chú
+-	Lưu trữ các thông tin về gia đình: Tình trạng hôn nhân (tên cha, mẹ, tên chồng, tên vợ, tên con cái).
+Tra cứu:
+-	Tra cứu nguồn gốc tổ tiên.
+-	Tra cứu thông tin cá thể.
+-	Tra cứu thông tin gia đình.
+b. Yêu cầu phi chức năng
+- Thực hiện đúng yêu cầu.
+- Giao diện: bố cục chặt chẽ, tạo cảm giác thoải mái và thân thiện với người dùng, trực quan, dễ hiểu.
+3. Lựa chọn ngôn ngữ lập trình
+Nhóm thực hiện đã sử dụng ngôn ngữ Microsoft C#.NET với phiên bản .NET Framewỏk 4.5.2; IDE và compiler nằm trong bộ Microsoft Visual Studio 2017 để cài đặt Phần mềm Quản lý Cây Gia Phả.
+PHẦN NỘI DUNG
+1. Mô tả Gia Phả
+Với đất nước Việt Nam ngày nay cũng như xa xưa ngay trong cuộc sống của chúng ta, các dòng họ lâu đời như : họ Nguyễn, Trần, Lý, Ngô, Đinh,… Mỗi dòng họ được chia làm nhiều chi khác nhau, qua các thế hệ này đến thế hệ khác.
+Bắt đầu từ người được tìm thấy đầu tiên trong họ (người sáng lập nên gia phả) và lấy người đàn ông làm gốc cho dòng họ của mình (gọi là Thủy tổ).
+Khi người này lập gia đình và có con thì những người con này là đời thứ hai.Và cứ tiếp diễn như vậy khi những người con trong đời thứ hai này lập gia đình thì những người con của họ là đời thứ ba và cứ thế theo đường dài thời gian họ liên tiếp kế thừa từ đời trên xuống dưới.
+Nếu nhìn bằng con mắt trực quan ta có thể hình dung cả một dòng họ đi từ trên xuống thì có thể sắp xếp theo một dạng cây có nhiều nhánh, các nhánh này chính là các chi mà ta đã nói ở trên. Những nhánh này có chung một gốc đó chính là người đầu tiên trong gia phả. Và các nhánh này lại được phân ra làm nhiều nhánh con khác nhau. Hai nhánh kề nhau biểu thị mối quan hệ cha – con.
+			     Hình 1. Mô tả cây gia phả
+2. Cấu trúc dữ liệu cho Cây Gia Phả
+2.1. Cấu trúc của một nút
+Một cây có nhiều nút, trong cây gia phả, mỗi nút chứa 3 thông tin:
+Thông tin khóa: info có kiểu dữ liệu là kiểu cấu trúc
+Địa chỉ của phần tử kế tiếp nằm bên trái: pLeft
+Địa chỉ của phần tử kế tiếp nằm bên phải: pRight
+Hình 2. Cấu trúc của 1 Node
+2.2. Cấu trúc của một gia phả
+Bao gồm mã ID của gia phả, ID của thành viên, thế hệ, họ tên thành viên, giới tính, năm sinh, năm mất, nơi sinh, nghề nghiệp, họ tên cha, họ tên mẹ, họ tên con…
+Hình 3. Cấu trúc của Gia Phả
+2.3. Một số hàm sử dụng cấu trúc
+Các thao tác ở phần này đa phần sử dụng phương pháp so sánh chuỗi (so sánh theo bảng mã ASCII). Nếu kết quả so sánh 2 chuỗi (chuỗi thứ nhất và chuỗi thứ hai):
+-	Bằng 0 : thì trả về kết quả chính bằng chuỗi ta đã so sánh.
+- 	Bằng 1 (chuỗi thứ nhất lớn hơn chuỗi thứ hai): thì trỏ về phía con trái (pLeft).
+- 	Bằng -1 (chuỗi thứ nhất nhỏ hơn chuỗi thứ hai): thì trỏ về phía con phải (pRight).
+2.3.1. Thêm cây
+Hình 4. Thêm cây
+2.3.2. Tìm kiếm nút
+Hình 5. Tìm kiếm một nút
+2.3.3. Xóa nút
+2.3.4. Xóa toàn bộ cây
+Hình 7. Xóa toàn bộ cây
+2.3.6. Tìm kiếm ba mẹ
+Hình 8. Tìm kiếm ba mẹ của một người
+3. Phương thức hoạt động của phần mềm 
+3.1. Thao tác thêm thành viên
+Hình 9. Thêm thành viên
+3.2. Thao tác xóa thành viên
+Hình 10. Xóa thành viên
+3.3. Thao tác sửa thông tin thành viên
+Hình 11. Sửa thông tin
+4. Thiết kế giao diện
+4.1. Form Khởi động
+Hình 12. Form Khởi động
+4.2. Form Chính
+4.2.1. Form xem Gia Phả dạng danh sách
+4.2.2. Form xem Gia Phả dạng cây thư mục
+4.2.3. Mục Menu
+-     Xem những người cùng thế hệ
+Hình 15. Menu xem người cùng thế hệ
+Xem thế hệ con cháu, ông bà
+Hình 16. Menu xem con cháu, ông bà
+ Xem những người cùng Gia Phả
+Hình 17. Menu xem người thuộc Gia Phả
+4.3. Form Hướng dẫn
+5. Mô tả Phân công công việc
+KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
+Khó khăn và thuận lợi khi thực hiện chương trình
+Khó khăn
+Lần đầu tiên làm đồ án cuối kỳ, cũng là bước đầu làm quen với ngôn ngữ lập trình C#.NET,  nhóm chưa có nhiều kinh nghiệm cũng như kiến thức cơ bản nên nhóm thực hiện đã phải vừa tìm hiểu, thực hiện và tham khảo kinh nghiệm từ các anh chị đi trước và sự hỗ trợ từ thầy hướng dẫn. Trong quá trình thực hiện đồ án, nhóm đã tốn khá nhiều thời gian để tìm hiểu về cách lập trình trên WindowForm C#, làm sao để truy vấn được dữ liệu và kết nối với giao diện để tổ chức nội dung hợp lí và có tính thiết thực hơn. Ban đầu nhóm dự tính lưu trữ dữ liệu trên tệp txt, nhưng vì những bất cập của nó nên nhóm đã tìm hiểu cách lưu dữ liệu mới đó là lưu trên SQL. Vì thế, ngoài việc tìm hiểu về cách tạo giao diện, nhóm đã gặp thêm khó khăn ở phần kết nối với dữ liệu vào chương trình. Ngoài ra, nhóm cũng xin chia sẻ thêm, ban đầu nhóm cũng đã đặt mục tiêu là vẽ được mô hình biểu diễn mối quan hệ giữa các thành viên trong gia phả để thể hiện hình ảnh một cách trực quan như hình ảnh của một cây tìm kiếm tổng quát. Vì vậy, nhóm đã tham khảo nhiều tài liệu trên internet nhưng vẫn chưa làm được vì kiến thức về lập trình trên WindowForm của nhóm vẫn còn nhiều hạn chế nên khó khăn trong việc đọc hiểu tài liệu. Vậy nên, sau hơn 1 tháng tìm hiểu kể từ ngày đăng kí đồ án, nhóm quyết định sẽ không đưa phần vẽ cây mô hình vào chương trình mà thay và đó sẽ biểu diễn gia phả dưới dạng cây thư mục bằng công cụ “Treeview” của WindowForm. Với công cụ này, nhóm vẫn biểu diễn được mối quan hệ giữa các thế hệ trong gia phả. Song, vẫn có những bất cập khi biểu diễn với dữ liệu lớn vì cần nhiều không gian và hình ảnh không đẹp như cây mô hình. Nhìn chung, đây là hướng giải quyết tạm thời của nhóm vì thời gian thực hiện chương trình không nhiều nên nhóm mong bạn dùng thông cảm cho sự bất tiện này. Nhóm sẽ cố gắng học hỏi và khắc phục vấn đề này trong tương lai để chương trình được hoàn thiện hơn.
+Thuận lợi
+Trong quá trình làm việc, nhóm thực hiện được Thầy Trần Công Tú – GVBM: Cấu trúc Dữ liệu và Giải thuật – tận tình hướng dẫn và giải đáp các thắc mắc giúp nhóm kịp thời sửa chữa và hoàn thiện đồ án nhanh nhất có thể.
+Các kiến thức cơ bản về C# và kết nối dữ liệu SQL đều được phổ biến trên internet đã hỗ trợ nhóm rất nhiều trong quá trình tham khảo học tập làm đồ án.
+Nhờ sự hỗ trợ của SQL Server. Nhóm có thể truy vấn và chỉnh sửa dễ dàng.
+Ưu điểm, nhược điểm
+Ưu điểm
+Giao diện thiết kế tương đối dễ sử dụng, dễ thao tác.
+Dữ liệu được lưu trữ một cách hợp lí, dễ dàng chỉnh sửa.
+Chương trình chạy tương đối ổn định với dữ liệu lớn (khoảng vài trăm người).
+Nhược điểm
+Bố cục của form vẫn còn nhiều chỗ chưa hợp lí.
+Chương trình còn khá đơn giản, chưa được hoàn thiện với đầy đủ các chức năng mà một phần mềm quản lý Gia Phả cần có.
+Vì phần mềm liên kết dữ liệu với SQL nên bắt buộc người dùng phải cài đặt thêm SQL Server Management Studio. 
+Mức độ hoàn thành của đồ án
+So với mục tiêu đề ra ban đầu, nhóm thực hiện đã hoàn thành khoảng 80% so với dự kiến. Nhóm thực hiện đã thực hiện được những thao tác sau:
+Cập nhật thông tin
+- Cập nhật thông tin cá nhân.
+- Cập nhật thông tin gia đình.
+Tra cứu những thông tin liên quan đến Gia Phả
+- Tra cứu thông tin cá nhân thuộc Gia Phả.
+Xuất cây Gia Phả và hỗ trợ những thao tác trên cây
+- Tra cứu, xuất thông tin theo yêu cầu.
+- Thêm, xóa, tìm kiếm.
+Lưu trữ
+- Lưu trữ các thông tin về cá nhân: ID cá nhân, ID Gia Phả, đời, họ và tên, ngày sinh, ngày mất, nơi sinh, nghề nghiệp.
+- Lưu trữ các thông tin về gia đình: Tình trạng hôn nhân (tên chồng/tên vợ, tên con cái).
+Hướng phát triển trong tương lai
+Với mục tiêu hướng đến phát triển một phần mềm quản lý đầy đủ và hoàn thiện, mong muốn sử dụng công nghệ vào đời sống để góp phần gìn giữ một nét văn hóa đẹp và lâu đời của người Việt Nam, nhóm sẽ cố gắng bổ sung thêm một số chức năng mới, đồng thời thiết kế lại giao diện để tiết kiệm bộ nhớ nhiều nhất có thể và chọn lại nơi lưu trữ mới thân thiện với người dùng hơn (ví dụ: Excel)
+Thêm tính năng chèn ảnh đại diện của mỗi thành viên trong Gia Phả.
+Vẽ cây Gia Phả dưới dạng sơ đồ phả hệ giúp người dùng dễ nhìn và dễ hiểu hơn.
+Thêm vào một số thông tin của thành viên, ví dụ như: nơi đặt mộ của người đã mất, cách xưng hô, thống kê những người đã lập gia đình, độc thân, tổng số người trong một gia phả.
+Đặc biệt, nếu có cơ hội được tìm hiểu và học tập sâu hơn về bộ môn này, nhóm thực hiện sẽ cố gắng phát triển phần mềm này liên kết với website để việc sử dụng có thể nhanh chóng và thuận tiện hơn đối với người dùng.
+Tổng kết
+Như đã đề cập ở phần Mở Đầu, phần mềm quản lý Gia Phả rất hữu ích trong cuộc sống. Phần mềm này không những giúp ta quản lý và lưu trữ thông tin của các thành viên trong từng thế hệ của dòng họ, mà còn giúp giữ gìn được nét văn hóa của dân tộc nói chung và của dòng họ nói riêng. 
+Tài liệu tham khảo
+Tài liệu về thiết kế giao diện trên WinForm
+https://www.howkteam.vn/course/lap-trinh-winform-co-ban-27
+Cách hiển thị cây dưới dạng Treeview
+http://diendan.congdongcviet.com/threads/t191021::load-database-len-treeview-theo-mo-hinh-cay-gia-pha-nhu-the-nao.cpp
+Tham khảo những câu truy vấn với SQL cho các nút thêm, sửa, xóa và hàm KetNoi()
+http://timoday.edu.vn/xay-dung-chuong-trinh-quan-ly-ban-hang-bang-c/
+Cách kết nối cơ sở dữ liệu với chương trình
+https://www.youtube.com/watch?v=gyvTmXghtgo
+Giáo trình Cấu trúc dữ liệu và giải thuật (ThS Lê Văn Vinh).

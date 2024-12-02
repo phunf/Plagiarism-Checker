@@ -1,9 +1,12 @@
 import os
+from pydoc import text
 import re
+from socket import timeout
 import docx
 import PyPDF2
 from typing import List, Dict, Union
 from difflib import SequenceMatcher
+import json
 import requests  # Thêm thư viện requests để kiểm tra trực tuyến
 
 class PlagiarismChecker:
@@ -18,6 +21,15 @@ class PlagiarismChecker:
         self.max_paragraphs = max_paragraphs
         self.supported_extensions = ['.txt', '.docx', '.pdf']
 
+        # Thiết lập thư mục lưu file
+        self.base_dir = os.path.join(os.getcwd(), 'uploads')
+        if not os.path.exists(self.base_dir):
+            os.makedirs(self.base_dir)
+
+        # Thiết lập API Google (thay thế bằng key của bạn)
+        self.google_api_key = "YOUR_GOOGLE_API_KEY"
+        self.search_engine_id = "YOUR_SEARCH_ENGINE_ID"
+        
     def _read_file(self, file_path: str) -> str:
         """
         Đọc nội dung file với nhiều phương pháp encoding và loại file
@@ -152,29 +164,22 @@ class PlagiarismChecker:
         return plagiarism_results
 
     def _get_uploaded_files(self) -> List[str]:
-        """
-        Lấy danh sách các tệp đã tải lên
-        
-        :return: Danh sách đường dẫn các tệp
-        """
+        """Lấy danh sách các file đã upload"""
         try:
-            # Thư mục lưu trữ các tệp đã tải lên
-            upload_dir = os.path.join(self.supported_extensions, 'uploaded_files')
-            
-            # Kiểm tra và tạo thư mục nếu chưa tồn tại
-            os.makedirs(upload_dir, exist_ok=True)
-            
-            # Lấy danh sách các tệp
-            uploaded_files = [
-                os.path.join(upload_dir, file) 
-                for file in os.listdir(upload_dir) 
-                if os.path.isfile(os.path.join(upload_dir, file))
-            ]
-            
-            return uploaded_files
+            if not os.path.exists(self.base_dir):
+                return []
+                
+            files = []
+            for filename in os.listdir(self.base_dir):
+                if os.path.isfile(os.path.join(self.base_dir, filename)):
+                    # Chỉ lấy các file có định dạng được hỗ trợ
+                    if any(filename.lower().endswith(ext) for ext in self.supported_extensions):
+                        files.append(os.path.join(self.base_dir, filename))
+            return files
         except Exception as e:
-            print(f"Lỗi khi lấy danh sách tệp đã tải: {e}")
+            print(f"Lỗi khi lấy danh sách file: {str(e)}")
             return []
+
 
     def check_internal_plagiarism(self, file_path: str) -> List[Dict[str, Union[str, float]]]:
         """
@@ -250,40 +255,74 @@ class PlagiarismChecker:
 
     def _search_google(self, query: str, num_results: int = 5) -> List[Dict[str, Union[str, float]]]:
         """
-        Tìm kiếm nguồn trực tuyến cho một đoạn văn
+        Tìm kiếm văn bản trên Google
         
-        :param query: Đoạn văn cần tìm kiếm
-        :param num_results: Số lượng kết quả tối đa
-        :return: Danh sách các nguồn tiềm năng
+        :param text: Văn bản cần tìm kiếm
+        :param timeout: Thời gian timeout cho request
+        :return: Danh sách các nguồn tìm thấy
         """
         try:
-            # Chú ý: Bạn cần thay thế API key và ID của bạn
-            url = f"https://www.googleapis.com/customsearch/v1"
+            # Giới hạn độ dài query
+            query = text[:1000]
+            
+            # Tạo URL tìm kiếm
+            search_url = f"https://www.googleapis.com/customsearch/v1"
             params = {
-                'key': 'YOUR_API_KEY',  # Thay bằng Google Custom Search API key của bạn
-                'cx': 'YOUR_CUSTOM_SEARCH_ENGINE_ID',  # Thay bằng Custom Search Engine ID của bạn
-                'q': f'"{query}"',
-                'num': num_results
+                'key': self.google_api_key,
+                'cx': self.search_engine_id,
+                'q': query
             }
             
-            response = requests.get(url, params=params)
+            # Thực hiện request với timeout
+            response = requests.get(
+                search_url, 
+                params=params,
+                timeout=timeout
+            )
+            
+            if response.status_code != 200:
+                print(f"Lỗi API Google: {response.status_code}")
+                return []
+                
+            # Parse kết quả JSON
             results = response.json()
             
-            potential_sources = []
-            for item in results.get('items', []):
-                similarity = self._calculate_similarity(query, item.get('snippet', ''))
-                if similarity > 0.5:
-                    potential_sources.append({
-                        'source': item.get('link', 'N/A'),
-                        'title': item.get('title', 'N/A'),
-                        'snippet': item.get('snippet', ''),
-                        'similarity': round(similarity * 100, 2)
-                    })
+            if 'items' not in results:
+                return []
+                
+            sources = []
+            for item in results['items'][:5]:  # Giới hạn 5 kết quả
+                try:
+                    # Lấy nội dung từ trang web
+                    page_content = self._get_page_content(item['link'])
+                    
+                    # Tính độ tương đồng
+                    similarity = self._calculate_similarity(text, page_content)
+                    
+                    if similarity > self.similarity_threshold:
+                        sources.append({
+                            'url': item['link'],
+                            'title': item['title'],
+                            'snippet': item.get('snippet', ''),
+                            'similarity': round(similarity * 100, 2)
+                        })
+                except Exception as e:
+                    print(f"Lỗi khi xử lý kết quả tìm kiếm: {str(e)}")
+                    continue
+                    
+            return sources
             
-            return potential_sources
-        
+        except requests.exceptions.Timeout:
+            print("Timeout khi tìm kiếm")
+            return []
+        except requests.exceptions.RequestException as e:
+            print(f"Lỗi request: {str(e)}")
+            return []
+        except json.JSONDecodeError as e:
+            print(f"Lỗi parse JSON: {str(e)}")
+            return []
         except Exception as e:
-            print(f"Lỗi tìm kiếm trực tuyến: {e}")
+            print(f"Lỗi không xác định: {str(e)}")
             return []
 
     def generate_plagiarism_report(self, file_path: str) -> Dict[str, Union[str, List]]:

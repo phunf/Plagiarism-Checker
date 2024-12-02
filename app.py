@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, json, render_template, request, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 import sys
@@ -112,6 +112,15 @@ def check_plagiarism():
             against_results = checker.check_plagiarism_against_uploaded_files(temp_filepath)
             online_results = checker.check_online_plagiarism(temp_filepath)
             
+            # Thực hiện các kiểm tra và chuyển đổi kết quả thành JSON
+            internal_results = json.dumps(checker.check_internal_plagiarism(temp_filepath))
+            against_results = json.dumps(checker.check_plagiarism_against_uploaded_files(temp_filepath))
+            online_results = json.dumps(checker.check_online_plagiarism(temp_filepath))
+            
+            # In log để debug
+            print("Internal Results:", internal_results)
+            print("Against Results:", against_results)
+            print("Online Results:", online_results)
             # Xóa file tạm
             if os.path.exists(temp_filepath):
                 os.remove(temp_filepath)
